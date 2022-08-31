@@ -12,13 +12,11 @@ spring:
         git:
           uri: https://github.com/leangeder/config-files.git
           defaultLabel: main
-          # # search-paths: "{infrastructure.team}/{infrastructure.environment}/{infrastructure.region}/{application}"
-          # searchPaths: '{infrastructure.team}/{infrastructure.environment}/{application}'
+          cloneOnStart: true
+          # pattern: "{}/customer_a_dev"
+          pattern: "{application}/{profile}"
+          # searchPaths: '{infrastructure.team}/{infrastructure.environment}/{application}/{profile}, {infrastructure.team}/{infrastructure.environment}/{infrastructure.region}/{application}/'
           searchPaths:
-          - '{infrastructure.team}'
-          - '{infrastructure.team}/{infrastructure.environment}'
-          - '{infrastructure.team}/{infrastructure.environment}/{application}'
-          - '{infrastructure.team}/{infrastructure.environment}/{infrastructure.region}'
-          - '{infrastructure.team}/{infrastructure.environment}/{infrastructure.region}/{application}'
+          - ${TEAM}/${ENVIRONMENT}/{application}/{profile}
 server:
   port: 8080

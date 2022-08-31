@@ -50,7 +50,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.hostIP
-        - name: SPRING_PROFILE
+        - name: SPRING_PROFILES_ACTIVE
           valueFrom:
             fieldRef:
               fieldPath: metadata.annotations['spring-profile']
@@ -73,24 +73,24 @@ spec:
         ports:
         - name: http-service
           containerPort: 8080
-        # # - name: http-metrics
-        # #   containerPort: 9090
-        # readinessProbe:
-        #   httpGet:
-        #     path: /actuator/health/readiness
-        #     port: http-service
-        #     scheme: HTTP
-        #   initialDelaySeconds: 5
-        #   periodSeconds: 10
-        #   successThreshold: 2
-        #   timeoutSeconds: 2
-        # livenessProbe:
-        #   failureThreshold: 3
-        #   httpGet:
-        #     path: /actuator/health/liveness
-        #     port: http-service
-        #     scheme: HTTP
-        #   initialDelaySeconds: 10
-        #   periodSeconds: 20
-        #   successThreshold: 1
-        #   timeoutSeconds: 2
+        # - name: http-metrics
+        #   containerPort: 9090
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: http-service
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 2
+          timeoutSeconds: 2
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/health/liveness
+            port: http-service
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 2
