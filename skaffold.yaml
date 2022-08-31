@@ -1,0 +1,32 @@
+---
+apiVersion: skaffold/v2beta29
+kind: Config
+build:
+  artifacts:
+  - image: harbor.platform.pe.core.underwriteme.co.uk/private/config-server
+    context: .
+    docker:
+      dockerfile: Dockerfile
+      cacheFrom:
+      - "harbor.platform.pe.core.underwriteme.co.uk/private/config-server:latest"
+  tagPolicy:
+    sha256: {}
+  local:
+    useDockerCLI: true
+    push: false
+deploy:
+  kustomize:
+    paths:
+    - .k8s/base/
+profiles:
+- name: dev
+  activation:
+  - command: dev
+  patches:
+  - op: replace
+    path: /deploy/kustomize/paths/0
+    value: .k8s/dev/
+  portForward:
+  - resourceType: service
+    resourceName: config-server
+    port: 8080

@@ -1,0 +1,96 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-server
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        fluentbit.io/parser: "json"
+        prometheus.io/port: "9090"
+        prometheus.io/scrape: "true"
+          # prometheus.io/path: "/admin/prometheus"
+    spec:
+      serviceAccountName: config-server
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app_name
+                  operator: In
+                  values:
+                  - config-server
+              topologyKey: topology.kubernetes.io/zone
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: app
+        image: harbor.platform.pe.core.underwriteme.co.uk/private/config-server:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PARAMS
+          value: ""
+        - name: EXTRA_PARAMS
+          value: ""
+        - name: MY_NODE_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: SPRING_PROFILE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['spring-profile']
+        - name: TEAM
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['team']
+        - name: ENVIRONMENT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['environment']
+        - name: REGION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['region']
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: false
+        ports:
+        - name: http-service
+          containerPort: 8080
+        # # - name: http-metrics
+        # #   containerPort: 9090
+        # readinessProbe:
+        #   httpGet:
+        #     path: /actuator/health/readiness
+        #     port: http-service
+        #     scheme: HTTP
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+        #   successThreshold: 2
+        #   timeoutSeconds: 2
+        # livenessProbe:
+        #   failureThreshold: 3
+        #   httpGet:
+        #     path: /actuator/health/liveness
+        #     port: http-service
+        #     scheme: HTTP
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 20
+        #   successThreshold: 1
+        #   timeoutSeconds: 2
