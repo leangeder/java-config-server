@@ -9,6 +9,9 @@ spring:
           defaultLabel: main
           pattern: "{application}/{profile}"
           searchPaths:
-          - ${TEAM}/${ENVIRONMENT}/{application}/{profile}
+          # - ${TEAM}/${ENVIRONMENT}/{application}/{profile}
+          - ${TEAM}/{application}
+          - ${TEAM}/{application}/${ENVIRONMENT}
+          - ${TEAM}/{application}/${ENVIRONMENT}/${REGION}
 server:
   port: 8080
